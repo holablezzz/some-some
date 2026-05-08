@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Me</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/webfont/tabler-icons.min.css" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #faf9f6;
+      --surface: #ffffff;
+      --surface-2: #f2f0ea;
+      --text: #1c1b18;
+      --muted: #888070;
+      --border: rgba(0,0,0,0.09);
+      --border-hover: rgba(0,0,0,0.18);
+      --accent: #c9a96e;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── SIDE PANELS ── */
+    .side-panel {
+      position: fixed;
+      top: 0;
+      height: 100vh;
+      width: 220px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+    }
+
+    .side-panel.left  { left: 0; }
+    .side-panel.right { right: 0; }
+
+    /* the thin trigger line */
+    .panel-trigger {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 6px;
+      cursor: pointer;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .side-panel.left  .panel-trigger { right: 0; }
+    .side-panel.right .panel-trigger { left: 0; }
+
+    .trigger-line {
+      width: 2px;
+      height: 60px;
+      border-radius: 2px;
+      background: rgba(0,0,0,0.12);
+      transition: background 0.3s ease, height 0.3s ease;
+    }
+
+    .side-panel:hover .trigger-line {
+      background: rgba(0,0,0,0.3);
+      height: 80px;
+    }
+
+    /* the sliding drawer */
+    .panel-drawer {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 210px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 2rem 1.25rem;
+      gap: 16px;
+      transition: transform 0.55s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.55s ease;
+      overflow: hidden;
+    }
+
+    .side-panel.left  .panel-drawer {
+      left: 0;
+      transform: translateX(-100%);
+      opacity: 0;
+      border-right: 1px solid var(--border);
+      border-left: none;
+      border-radius: 0 16px 16px 0;
+    }
+
+    .side-panel.right .panel-drawer {
+      right: 0;
+      transform: translateX(100%);
+      opacity: 0;
+      border-left: 1px solid var(--border);
+      border-right: none;
+      border-radius: 16px 0 0 16px;
+    }
+
+    .side-panel:hover .panel-drawer {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .panel-label {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    /* album cards inside panels */
+    a.album { text-decoration: none; color: inherit; }
+
+    .album {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      cursor: default;
+      transition: all 0.25s ease;
+    }
+
+    .album:hover {
+      border-color: var(--border-hover);
+      background: var(--surface);
+      transform: translateX(3px);
+    }
+
+    .side-panel.right .album:hover { transform: translateX(-3px); }
+
+    .album-art {
+      width: 42px;
+      height: 42px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      object-fit: cover;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      display: block;
+    }
+
+    .album-info { overflow: hidden; }
+
+    .album-title {
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .album-artist {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .now-playing {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .now-playing i { font-size: 13px; animation: bounce 1s ease-in-out infinite alternate; }
+
+    @keyframes bounce {
+      from { transform: scaleY(0.6); }
+      to   { transform: scaleY(1.2); }
+    }
+
+    /* ── MAIN PAGE ── */
+    .page {
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 3.5rem 1.75rem 5rem;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.7s ease both;
+    }
+
+    @keyframes spin {
+      from { transform: scale(1.7) rotate(0deg); }
+      to   { transform: scale(1.7) rotate(360deg); }
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      cursor: default;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+    }
+
+    .avatar:hover {
+      animation: spin 0.18s linear infinite;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+    }
+
+    .profile-text h1 {
+      font-family: 'Lora', serif;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+
+    .profile-text p { font-size: 14px; color: var(--muted); font-weight: 300; }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--surface-2);
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-top: 6px;
+    }
+
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #6dbf8a;
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(1.4); }
+    }
+
+    .bio {
+      font-family: 'Lora', serif;
+      font-size: 17px;
+      line-height: 1.8;
+      color: var(--text);
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+
+    .bio em { color: var(--accent); font-style: italic; }
+
+    .label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .interests {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+
+    .tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 30px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 13px;
+      color: var(--text);
+      cursor: default;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+    }
+
+    .tag span { font-size: 16px; transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+    .tag:hover {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+      transform: translateY(-3px) scale(1.04);
+    }
+
+    .tag:hover span { transform: rotate(15deg) scale(1.25); }
+
+    .facts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.7s 0.3s ease both;
+    }
+
+    .fact {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.2rem 1.25rem;
+      cursor: default;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fact::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 10% 10%, var(--surface-2) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .fact:hover { transform: translateY(-5px); border-color: var(--border-hover); box-shadow: 0 10px 30px rgba(0,0,0,0.07); }
+    .fact:hover::after { opacity: 1; }
+    .fact:hover .fact-icon { transform: scale(1.3) rotate(-8deg); }
+
+    .fact-icon { font-size: 24px; margin-bottom: 10px; display: block; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .fact-title { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+    .fact-value { font-size: 12px; color: var(--muted); font-weight: 300; }
+
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      animation: fadeUp 0.7s 0.4s ease both;
+    }
+
+    a.link-row { text-decoration: none; }
+
+    .link-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .link-row:hover { border-color: var(--border-hover); transform: translateX(5px); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+    .link-row:hover .link-arrow { transform: translateX(5px); opacity: 1; }
+    .link-row:hover .link-icon { transform: scale(1.15) rotate(-5deg); }
+
+    .link-left { display: flex; align-items: center; gap: 12px; }
+
+    .link-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: var(--surface-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .link-name { font-size: 14px; font-weight: 500; }
+    .link-sub { font-size: 12px; color: var(--muted); font-weight: 300; }
+    .link-arrow { font-size: 16px; color: var(--muted); opacity: 0.4; transition: all 0.25s ease; }
+
+    .footer {
+      margin-top: 3.5rem;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      animation: fadeUp 0.7s 0.5s ease both;
+    }
+
+    .footer span { display: inline-block; animation: pulse 3s ease-in-out infinite; color: #e07070; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .facts { grid-template-columns: 1fr; }
+      .profile { flex-direction: column; text-align: center; }
+      .side-panel { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  
+  <div class="side-panel left">
+    <div class="panel-trigger">
+      <div class="trigger-line"></div>
+    </div>
+    <div class="panel-drawer">
+      <div class="now-playing">
+        <i class="ti ti-music"></i> faves
+      </div>
+      <p class="panel-label">Top picks</p>
+      <a class="album" href="https://www.youtube.com/watch?v=8StX0o8Xan0" target="_blank" rel="noopener">
+        <img class="album-art" src="https://img.youtube.com/vi/8StX0o8Xan0/mqdefault.jpg" alt="Surviving" />
+        <div class="album-info">
+          <div class="album-title">Surviving</div>
+          <div class="album-artist">Sondr</div>
+        </div>
+      </a>
+      <a class="album" href="https://www.youtube.com/watch?v=-c8xnBY1uLw" target="_blank" rel="noopener">
+        <img class="album-art" src="https://img.youtube.com/vi/-c8xnBY1uLw/mqdefault.jpg" alt="Heartache" />
+        <div class="album-info">
+          <div class="album-title">Heartache</div>
+          <div class="album-artist">Sondr</div>
+        </div>
+      </a>
+      <a class="album" href="https://www.youtube.com/watch?v=SSTp0rknOgA" target="_blank" rel="noopener">
+        <img class="album-art" src="https://img.youtube.com/vi/SSTp0rknOgA/mqdefault.jpg" alt="ILYSB" />
+        <div class="album-info">
+          <div class="album-title">ILYSB</div>
+          <div class="album-artist">LANY</div>
+        </div>
+      </a>
+      <a class="album" href="https://www.youtube.com/watch?v=XUqRem0W8L8" target="_blank" rel="noopener">
+        <img class="album-art" src="https://img.youtube.com/vi/XUqRem0W8L8/mqdefault.jpg" alt="God's Plan" />
+        <div class="album-info">
+          <div class="album-title">God's Plan</div>
+          <div class="album-artist">Drake</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  
+  <div class="side-panel right">
+    <div class="panel-trigger">
+      <div class="trigger-line"></div>
+    </div>
+    <div class="panel-drawer">
+      <div class="now-playing">
+        <i class="ti ti-player-play"></i> now playing
+      </div>
+      <p class="panel-label">Queue</p>
+      <a class="album" href="https://www.youtube.com/watch?v=tvTRZJ-4EyI" target="_blank" rel="noopener">
+        <img class="album-art" src="https://img.youtube.com/vi/tvTRZJ-4EyI/mqdefault.jpg" alt="HUMBLE." />
+        <div class="album-info">
+          <div class="album-title">HUMBLE.</div>
+          <div class="album-artist">Kendrick Lamar</div>
+        </div>
+      </a>
+      <a class="album" href="https://www.youtube.com/watch?v=xvZqHgFz51I" target="_blank" rel="noopener">
+        <img class="album-art" src="https://img.youtube.com/vi/xvZqHgFz51I/mqdefault.jpg" alt="Mask Off" />
+        <div class="album-info">
+          <div class="album-title">Mask Off</div>
+          <div class="album-artist">Future</div>
+        </div>
+      </a>
+      <a class="album" href="https://www.youtube.com/watch?v=b_mLYlJZzMM" target="_blank" rel="noopener">
+        <img class="album-art" src="https://img.youtube.com/vi/b_mLYlJZzMM/mqdefault.jpg" alt="Swim" />
+        <div class="album-info">
+          <div class="album-title">Swim</div>
+          <div class="album-artist">DVBBS & Sondr</div>
+        </div>
+      </a>
+      <a class="album" href="https://www.youtube.com/watch?v=RPvhItA3lIM" target="_blank" rel="noopener">
+        <img class="album-art" src="https://img.youtube.com/vi/RPvhItA3lIM/mqdefault.jpg" alt="ILYSB Lyric" />
+        <div class="album-info">
+          <div class="album-title">ILYSB (Lyric)</div>
+          <div class="album-artist">LANY</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  
+  <div class="page">
+
+    <div class="profile">
+      <img class="avatar" src="nukie bleyz.png" alt="Nukie Bleyz" />
+      <div class="profile-text">
+        <h1>mga coworker nga sipsip</h1>
+        <p>chud</p>
+        <div class="status">
+          <div class="status-dot"></div>
+          abtik pirme
+        </div>
+      </div>
+    </div>
+
+    <p class="bio">
+      ako diayy si nukie bleyz i hate sipsip nga mga coworkers
+    </p>
+
+    <p class="label">Bisyo</p>
+    <div class="interests">
+      <div class="tag"><span>🎵</span> Sondr</div>
+      <div class="tag"><span>📚</span> Reading And Matcha</div>
+      <div class="tag"><span>🎮</span> Gaming</div>
+      <div class="tag"><span>🎬</span> Movies</div>
+      <div class="tag"><span>🐱</span> Cats</div>
+    </div>
+
+    <p class="label">Mga dapat nimo mahibaw an</p>
+    <div class="facts">
+      <div class="fact">
+        <span class="fact-icon">📍</span>
+        <div class="fact-title">Based in</div>
+        <div class="fact-value">Davao</div>
+      </div>
+      <div class="fact">
+        <span class="fact-icon">🌙</span>
+        <div class="fact-title">Coworkers</div>
+        <div class="fact-value">mga sipsip</div>
+      </div>
+      <div class="fact">
+        <span class="fact-icon">🎧</span>
+        <div class="fact-title">Currently listening</div>
+        <div class="fact-value">The Kings of Underground</div>
+      </div>
+      <div class="fact">
+        <span class="fact-icon">📖</span>
+        <div class="fact-title">Currently reading</div>
+        <div class="fact-value">Corellian Trilogy</div>
+      </div>
+    </div>
+
+    <p class="label">Find me</p>
+    <div class="links">
+      <a class="link-row" href="https://www.instagram.com/cyann.ray/" target="_blank" rel="noopener">
+        <div class="link-left">
+          <div class="link-icon">📷</div>
+          <div>
+            <div class="link-name">Instagram</div>
+            <div class="link-sub">@cyann.ray</div>
+          </div>
+        </div>
+        <i class="ti ti-arrow-right link-arrow"></i>
+      </a>
+      <a class="link-row" href="https://www.facebook.com/babatundih/" target="_blank" rel="noopener">
+        <div class="link-left">
+          <div class="link-icon">👤</div>
+          <div>
+            <div class="link-name">Facebook</div>
+            <div class="link-sub">babatundih</div>
+          </div>
+        </div>
+        <i class="ti ti-arrow-right link-arrow"></i>
+      </a>
+    </div>
+
+    <div class="footer">
+      babatunde
+    </div>
+
+  </div>
+
+</body>
+</html>
